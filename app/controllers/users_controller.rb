@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_filter :authenticate, :only => [:index, :edit, :update, :destroy]
   before_filter :correct_user, :only => [:edit, :update]
+  before_filter :ignore_create, :only => [:new, :create]
   before_filter :admin_user, :only => :destroy
 
   def new
@@ -63,7 +64,18 @@ class UsersController < ApplicationController
       redirect_to(root_path) unless current_user?(@user)
     end
 
+    def ignore_create
+      if signed_in?
+        redirect_to(root_path)
+      end
+    end
+
     def admin_user
-      redirect_to(root_path) unless current_user.admin?
+      @user = User.find(params[:id])
+      if current_user?(@user)
+        redirect_to(root_path)
+      else
+        redirect_to(root_path) unless current_user.admin?
+      end
     end
 end
