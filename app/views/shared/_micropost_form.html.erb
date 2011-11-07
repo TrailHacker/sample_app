@@ -1,9 +1,26 @@
 <%= form_for @micropost do |f| %>
   <%= render 'shared/error_messages', :object => f.object %>
   <div class="field">
-    <%= f.text_area :content %>
+    <%= f.text_area :content, "data-bind" => "value: content, valueUpdate: 'afterkeydown'" %>
   </div>
+  <div style="float: right;" data-bind="text: charsRemaining"></div>
   <div class="actions">
     <%= f.submit "Submit" %>
   </div>
+  <script type="text/javascript">
+    function viewModel(){
+      this.totalChars = 140;
+      this.content = ko.observable();
+      this.charsRemaining = ko.dependentObservable(function(){
+        var content = this.content();
+        return this.totalChars - (content ? content.length : 0);
+      }.bind(this));
+    }
+
+    $(function(){
+      var vm = new viewModel();
+      ko.applyBindings(vm);    
+    });
+
+  </script>
 <% end %>
